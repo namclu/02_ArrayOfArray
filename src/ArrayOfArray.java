@@ -13,42 +13,58 @@
 *
 * Do not use division in your solution.
 *
-* Solution attempt: brute force
+* Solution attempt:
+*
 * */
+
+import java.util.Arrays;
 
 public class ArrayOfArray {
 
     public static void main(String[] args) {
-        int[] inputArray = {1, 7, 3, 4};
-        int[] productArray = getProductsOfAllIntsExceptAtIndex(inputArray);
-
+        int[] intArray = {1, 7, 3, 4};
         System.out.println("productArray:");
-        for (int myArray: productArray) {
-            System.out.println(myArray);
-
-        }
+        System.out.println(Arrays.toString(getProductsOfAllIntsExceptAtIndex(intArray)));
     }
 
     public static int[] getProductsOfAllIntsExceptAtIndex(int[] inputArray) {
-        int[] productArray = new int[inputArray.length];
-
-        // i = 0,  i < 4
-        for (int i = 0; i < inputArray.length; i++) {
-            int product = 1;
-
-            // j = 0, 1, 2, 3, j < 4
-            for (int j = 0; j < inputArray.length; j++) {
-                // false,
-                if (i != j) {
-                    // product = 1, 1 * 7 = 7, 7 * 3 = 21, 21 * 4 = 84
-                    product *= inputArray[j];
-                    System.out.println(product);
-                }
-            }
-            // [84, ]
-            productArray[i] = product;
-            System.out.println("---");
+        // need an array of at least 2 numbers
+        if (inputArray.length < 2) {
+            throw new IllegalArgumentException("Product of numbers at other indices requires at least 2 numbers");
         }
-        return productArray;
+
+        int[] productsArray = new int[inputArray.length];
+
+        // for each integer, find the product of all the integers
+        // before it, storing the total product so far each time
+        // [0] is always 1
+        int productSoFar = 1;
+
+        // intArray = {1, 7, 3, 4}
+        // i = 0, productsArray = [1, 0, 0, 0], productsSoFar = 1 = (1 * 1)
+        // i = 1, productsArray = [1, 1, 0, 0], productsSoFar = 7 = (1 * 1 * 7)
+        // i = 2, productsArray = [1, 1, 7, 0], productSoFar = 21 = (1 * 1 * 7 * 3)
+        // i = 3, productsArray = [1, 1, 7, 21], productSoFar = 84 = (1 * 1 * 7 * 3 * 4)
+        for (int i = 0; i < inputArray.length; i++) {
+            productsArray[i] = productSoFar;
+            productSoFar *= inputArray[i];
+        }
+
+        // now for each integer, find the product of all the integers
+        // AFTER it, storing the total product so far each time
+        // [array.length - 1] is always 1
+        productSoFar = 1;
+
+        // intArray = {1, 7, 3, 4}
+        // j = 3, productsArray = [1, 1, 7, 21 * 1], productsSoFar = 4 = (4 * 1)
+        // j = 2, productsArray = [1, 1, 7 * 4, 21], productsSoFar = 12 = (3 * 4 * 1)
+        // j = 1, productsArray = [1, 1 * 12, 28, 21], productSoFar = 84 = (7 * 3 * 4 * 1)
+        // j = 0, productsArray = [1 * 84, 12, 28, 21], productSoFar = 84 = (1 * 7 * 3 * 4 * 1)
+        for (int j = inputArray.length - 1; j >= 0 ; j--) {
+            productsArray[j] *= productSoFar;
+            productSoFar *= inputArray[j];
+        }
+
+        return productsArray;
     }
 }
